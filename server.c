@@ -6,11 +6,9 @@
 #include <winsock.h>
 #else
 #define closesocket close
-
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-
 #endif
 
 #include <stdio.h>
@@ -34,17 +32,17 @@ int main() {
     WSADATA wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if(iResult != 0) {
-        printf("Error at WSAStartup\n");
+        printf("Error at WSAStartup!\n");
         return 0;
     }
 #endif
 
     int sock;
-    struct sockaddr_in echoServAddr;
-    struct sockaddr_in echoClntAddr;
-    unsigned int cliAddrLen;
-    char echoBuffer[ECHOMAX];
-    int recvMsgSize;
+    struct sockaddr_in serverAddr;
+    struct sockaddr_in clientAddr;
+    unsigned int clientAddrLen;  //lunghezza dell'indirizzo
+    char buffer[ECHOMAX];
+    int recvMsgSize;  //dimensione del messaggio
 
     //CREAZIONE DELLA SOCKET
     if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
@@ -52,29 +50,27 @@ int main() {
     }
 
     // COSTRUZIONE DELL'INDIRIZZO DEL SERVER
-    memset(&echoServAddr, 0, sizeof(echoServAddr));
-    echoServAddr.sin_family = AF_INET;
-    echoServAddr.sin_port = htons(PORT);
-
-    echoServAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    memset(&serverAddr, 0, sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(PORT);
+    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     // BIND DELLA SOCKET
-    if ((bind(sock, (struct sockaddr *) &echoServAddr, sizeof(echoServAddr))) < 0)
-        errorHandler("bind() failed");
+    if ((bind(sock, (struct sockaddr *) &serverAddr, sizeof(serverAddr))) < 0) {
+        errorHandler("bind() failed!");
+    }
 
     // RICEZIONE DELLA STRINGA ECHO DAL CLIENT
     while (1) {
-        cliAddrLen = sizeof(echoClntAddr);
-        recvMsgSize = recvfrom(sock, echoBuffer, ECHOMAX, 0, (struct sockaddr *) &echoClntAddr, &cliAddrLen);
-        printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
-        printf("Received: %s \n", echoBuffer);
-
-        printf("Received: %s\n", echoBuffer);
+        clientAddrLen = sizeof(clientAddr);
+        recvMsgSize = recvfrom(sock, buffer, ECHOMAX, 0, (struct sockaddr *) &clientAddr, &clientAddrLen);
+        printf("Handling client %s\n", inet_ntoa(clientAddr.sin_addr));
+        printf("Received: %s \n", buffer);
 
         // RINVIA LA STRINGA ECHO AL CLIENT
-        if (sendto(sock, echoBuffer, recvMsgSize, 0, (struct sockaddr *) &echoClntAddr, sizeof(echoClntAddr)) !=
-            recvMsgSize)
-            ErrorHandler("sendto() sent different number of bytes than expected");
+        if (sendto(sock, buffer, recvMsgSize, 0, (struct sockaddr *) &clientAddr, sizeof(clientAddr)) != recvMsgSize) {
+            errorHandler("sendto() sent different number of bytes than expected!");
+        }
     }
 }
 
