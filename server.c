@@ -69,7 +69,7 @@ int main() {
         printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
         printf("Received: %s \n", echoBuffer);
 
-        printf(Received: %s\n, echoBuffer);
+        printf("Received: %s\n", echoBuffer);
 
         // RINVIA LA STRINGA ECHO AL CLIENT
         if (sendto(sock, echoBuffer, recvMsgSize, 0, (struct sockaddr *) &echoClntAddr, sizeof(echoClntAddr)) !=
