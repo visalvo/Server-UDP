@@ -81,7 +81,7 @@ int main() {
             return 0;
         }
         buffer[recvMsgSize] = '\0';
-        printf("Message: '%s'\n", buffer);
+        printf("Message from the client: '%s'\n", buffer);
 
         struct in_addr addr;
         char *s = inet_ntoa(clientAddr.sin_addr);
@@ -99,10 +99,8 @@ int main() {
         }
 
         //RICEZIONE VOCALI DAL CLIENT
-        printf("Vocali ricevute: ");
-        //char str_vow[DIM_MSG];
+        printf("Vocali ricevute dal client: ");
         char c;
-        //int i = 0;
         int ans = 1;
         while(ans) {
             if ( (recvMsgSize = recvfrom(sock, buffer, 1, 0, (struct sockaddr *) &clientAddr, &clientAddrLen)) <= 0) {
@@ -110,6 +108,9 @@ int main() {
                 closeConnection(sock);
                 return 0;
             }
+
+            buffer[recvMsgSize] = '\0';
+            printf("%s, ", buffer);
 
             if(buffer[0] == '\n') {
                 ans = 0;
@@ -124,6 +125,7 @@ int main() {
             }
         }
 
+        puts("");
         system("pause");
     }
 
