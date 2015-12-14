@@ -3,7 +3,9 @@
 //
 
 #if defined WIN32
+
 #include <winsock.h>
+
 #else
 #define closesocket close
 #include <sys/socket.h>
@@ -37,7 +39,7 @@ int main() {
 #if defined WIN32
     WSADATA wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if(iResult != 0) {
+    if (iResult != 0) {
         printf("Error at WSAStartup!\n");
         return 0;
     }
@@ -73,9 +75,10 @@ int main() {
 
 
     while (1) {
+        printf("Server avviato...\n");
         // RICEZIONE DEL MESSAGGIO INIZIALE DEL CLIENT CON IL NOME DELL'HOST
         clientAddrLen = sizeof(clientAddr);
-        if ( (recvMsgSize = recvfrom(sock, buffer, DIM_MSG, 0, (struct sockaddr *) &clientAddr, &clientAddrLen)) <= 0) {
+        if ((recvMsgSize = recvfrom(sock, buffer, DIM_MSG, 0, (struct sockaddr *) &clientAddr, &clientAddrLen)) <= 0) {
             errorHandler("recvfrom() receive different number of bytes than expected!");
             closeConnection(sock);
             return 0;
@@ -86,7 +89,7 @@ int main() {
         struct in_addr addr;
         char *s = inet_ntoa(clientAddr.sin_addr);
         addr.s_addr = inet_addr(s);
-        struct hostent *host = gethostbyaddr((char*) &addr, 4, AF_INET);
+        struct hostent *host = gethostbyaddr((char *) &addr, 4, AF_INET);
         printf("Received from client with host name: '%s'\n", host->h_name);
 
         //INVIO DEL MESSAGGIO OK AL CLIENT
@@ -102,20 +105,19 @@ int main() {
         printf("Vocali ricevute dal client: ");
         char c;
         int ans = 1;
-        while(ans) {
-            if ( (recvMsgSize = recvfrom(sock, buffer, 1, 0, (struct sockaddr *) &clientAddr, &clientAddrLen)) <= 0) {
+        while (ans) {
+            if ((recvMsgSize = recvfrom(sock, buffer, 1, 0, (struct sockaddr *) &clientAddr, &clientAddrLen)) <= 0) {
                 errorHandler("recvfrom() receive different number of bytes than expected!");
                 closeConnection(sock);
                 return 0;
             }
 
-            buffer[recvMsgSize] = '\0';
-            printf("%s, ", buffer);
-
-            if(buffer[0] == '\n') {
+            if (buffer[0] == '\n') {
                 ans = 0;
             }
             else {
+                buffer[recvMsgSize] = '\0';
+                printf("%s, ", buffer);
                 c = toupper(buffer[0]);
                 if (sendto(sock, &c, 1, 0, (struct sockaddr *) &clientAddr, sizeof(clientAddr)) != 1) {
                     errorHandler("sendto() sent different number of bytes than expected!");
@@ -125,7 +127,7 @@ int main() {
             }
         }
 
-        puts("");
+        printf("\n");
         system("pause");
     }
 
