@@ -75,7 +75,6 @@ int main() {
 
 
     while (1) {
-        printf("Server avviato...\n");
         // RICEZIONE DEL MESSAGGIO INIZIALE DEL CLIENT CON IL NOME DELL'HOST
         clientAddrLen = sizeof(clientAddr);
         if ((recvMsgSize = recvfrom(sock, buffer, DIM_MSG, 0, (struct sockaddr *) &clientAddr, &clientAddrLen)) <= 0) {
@@ -126,9 +125,6 @@ int main() {
                 }
             }
         }
-
-        printf("\n\n");
-        system("pause");
     }
 
 }
